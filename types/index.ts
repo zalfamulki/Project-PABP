@@ -5,10 +5,13 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  phone?: string;
+  address?: string;
   store?: {
     id: number;
     store_name: string;
     location: string;
+    phone?: string;
   };
 }
 
@@ -22,6 +25,7 @@ export interface MenuItem {
   isAvailable: boolean;
   stock?: number;
   store_id?: number;
+  storeName?: string;
 }
 
 export type OrderStatus = "pending" | "preparing" | "ready" | "completed" | "cancelled";
@@ -33,6 +37,7 @@ export interface OrderItem {
   price: number;
   quantity: number;
   store_id?: number;
+  storeName?: string;
 }
 
 export interface Order {

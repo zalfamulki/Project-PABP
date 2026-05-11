@@ -113,7 +113,8 @@ export const api = {
         imageUrl: item.image_url,
         isAvailable: Boolean(item.is_available),
         stock: item.stock,
-        store_id: item.store_id
+        store_id: item.store_id,
+        storeName: item.store?.store_name
       }));
     },
     add: async (item: Omit<MenuItem, "id">): Promise<MenuItem> => {
@@ -252,6 +253,30 @@ export const api = {
       } catch (e) {
         return { totalPending: 0, totalPreparing: 0, averageWaitTimeMins: 0, queueLoad: "low" };
       }
+    }
+  },
+
+  user: {
+    updateProfile: async (userData: { name?: string, phone?: string, address?: string }): Promise<User> => {
+      const res = await fetch(`${API_URL}/profile`, {
+        method: 'PUT',
+        headers: getHeaders(true),
+        body: JSON.stringify(userData)
+      });
+      const data = await handleResponse(res);
+      return data.user;
+    }
+  },
+
+  store: {
+    update: async (id: number, storeData: { store_name?: string, location?: string, phone?: string }): Promise<any> => {
+      const res = await fetch(`${API_URL}/stores/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(true),
+        body: JSON.stringify(storeData)
+      });
+      const data = await handleResponse(res);
+      return data.data;
     }
   },
 

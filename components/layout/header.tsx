@@ -31,7 +31,9 @@ export function Header() {
         <div className="flex items-center gap-3 pl-6 border-l border-border">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-foreground line-clamp-1">{user?.name || "Guest"}</p>
-            <p className="text-xs text-text-secondary capitalize">{user?.role || "Visitor"}</p>
+            <p className="text-xs text-text-secondary capitalize">
+              {user?.role === 'seller' && user?.store?.store_name ? user.store.store_name : (user?.role || "Visitor")}
+            </p>
           </div>
           <div className="h-10 w-10 rounded-xl bg-surface-elevated flex items-center justify-center text-text-secondary border border-border overflow-hidden">
             <UserIcon className="h-6 w-6" />

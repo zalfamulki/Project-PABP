@@ -69,7 +69,14 @@ export default function CartPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
-                    <p className="text-primary font-bold mt-1">Rp{Number(item.price || 0).toLocaleString('id-ID')}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-primary font-bold">Rp{Number(item.price || 0).toLocaleString('id-ID')}</p>
+                      {item.storeName && (
+                        <span className="text-[10px] text-text-secondary uppercase font-bold bg-surface-elevated px-2 py-0.5 rounded-lg border border-border">
+                          {item.storeName}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -108,6 +115,13 @@ export default function CartPage() {
           <div className="space-y-6">
             <Card className="p-8 space-y-8 bg-surface-elevated border-none shadow-none">
               <h2 className="text-2xl font-bold font-heading text-foreground border-b border-border pb-4">Summary</h2>
+              
+              {cart[0]?.storeName && (
+                <div className="flex items-center gap-2 text-sm text-text-secondary">
+                  <ShoppingBag className="h-4 w-4" />
+                  Ordering from: <span className="font-bold text-foreground">{cart[0].storeName}</span>
+                </div>
+              )}
               
               <div className="space-y-4">
                 <div className="flex justify-between text-text-secondary font-medium">

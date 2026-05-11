@@ -69,6 +69,9 @@ export function MenuCard({ item }: MenuCardProps) {
             <span className="text-[10px] font-bold text-text-secondary uppercase">Stock: {item.stock}</span>
           </div>
           <h3 className="text-lg font-bold text-foreground mt-0.5">{item.name}</h3>
+          {item.storeName && (
+            <p className="text-[10px] text-text-secondary font-medium uppercase tracking-wider mt-1">Shop: {item.storeName}</p>
+          )}
           <p className="text-sm text-text-secondary line-clamp-2 mt-1.5 leading-relaxed">{item.description}</p>
         </div>
 
