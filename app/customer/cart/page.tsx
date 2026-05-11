@@ -69,7 +69,7 @@ export default function CartPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
-                    <p className="text-primary font-bold mt-1">${item.price.toFixed(2)}</p>
+                    <p className="text-primary font-bold mt-1">Rp{Number(item.price || 0).toLocaleString('id-ID')}</p>
                   </div>
                 </div>
 
@@ -91,7 +91,7 @@ export default function CartPage() {
                   </div>
                   
                   <div className="text-right min-w-[100px]">
-                    <p className="text-lg font-black text-foreground">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-lg font-black text-foreground">Rp{(Number(item.price || 0) * Number(item.quantity || 0)).toLocaleString('id-ID')}</p>
                     <button 
                       onClick={() => removeFromCart(item.id)}
                       className="text-danger text-sm font-bold mt-1 hover:underline"
@@ -112,7 +112,7 @@ export default function CartPage() {
               <div className="space-y-4">
                 <div className="flex justify-between text-text-secondary font-medium">
                   <span>Subtotal</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>Rp{Number(cartTotal || 0).toLocaleString('id-ID')}</span>
                 </div>
                 <div className="flex justify-between text-text-secondary font-medium">
                   <span>Queue Fee</span>
@@ -120,7 +120,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-2xl font-black text-foreground pt-4 border-t border-border">
                   <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>Rp{Number(cartTotal || 0).toLocaleString('id-ID')}</span>
                 </div>
               </div>
 

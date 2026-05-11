@@ -14,8 +14,8 @@ export default function QueueTrackingPage() {
   const { orders, fetchOrders } = useOrderStore();
   const { fetchStats, isLoadingStats: isLoading } = useQueueStore();
   
-  // In a real app, we'd get the specific order from the URL or store
-  const latestOrder = orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  const activeOrders = orders.filter(o => o.status !== "completed" && o.status !== "cancelled");
+  const latestOrder = [...activeOrders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
   useEffect(() => {
     fetchOrders();
@@ -44,8 +44,7 @@ export default function QueueTrackingPage() {
     );
   }
 
-  // Mock queue data calculation
-  const queuePos = orders.filter(o => o.status !== "completed" && new Date(o.createdAt) < new Date(latestOrder.createdAt)).length + 1;
+  const queuePos = activeOrders.filter(o => (o.status === "pending" || o.status === "preparing") && new Date(o.createdAt) < new Date(latestOrder.createdAt)).length + 1;
 
   return (
     <DashboardLayout allowedRole="customer">
@@ -72,7 +71,7 @@ export default function QueueTrackingPage() {
           <div className="lg:col-span-3">
             <QueueTracker 
               position={queuePos}
-              totalInQueue={orders.filter(o => o.status !== "completed").length}
+              totalInQueue={activeOrders.filter(o => o.status === "pending" || o.status === "preparing").length}
               estimatedTime={queuePos * 5} // 5 mins per order
               status={latestOrder.status}
             />
@@ -112,12 +111,12 @@ export default function QueueTrackingPage() {
                 {latestOrder.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between text-sm">
                     <span className="text-text-secondary"><span className="font-bold text-foreground">x{item.quantity}</span> {item.name}</span>
-                    <span className="font-bold text-foreground">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-bold text-foreground">Rp{(Number(item.price || 0) * Number(item.quantity || 0)).toLocaleString('id-ID')}</span>
                   </div>
                 ))}
                 <div className="pt-3 border-t border-border flex justify-between font-black text-lg text-foreground">
                   <span>Total Paid</span>
-                  <span>${latestOrder.totalAmount.toFixed(2)}</span>
+                  <span>Rp{Number(latestOrder.totalAmount || 0).toLocaleString('id-ID')}</span>
                 </div>
               </div>
             </Card>

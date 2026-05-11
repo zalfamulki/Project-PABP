@@ -44,11 +44,13 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await login(data.email, data.role);
-      toast.success(`Welcome back! Logged in as ${data.role}`);
-      router.push(data.role === "seller" ? "/seller" : "/customer");
+      await login(data.email, data.password, data.role);
+      toast.success(`Welcome back!`);
+      // The store now has the user object with the role from backend
+      const user = useAuthStore.getState().user;
+      router.push(user?.role === "seller" ? "/seller" : "/customer");
     } catch (error) {
-      toast.error("Invalid credentials. Please try again.");
+      toast.error("password atau email salah. Silahkan coba lagi.");
     } finally {
       setIsLoading(false);
     }

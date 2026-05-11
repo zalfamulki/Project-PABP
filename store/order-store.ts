@@ -38,7 +38,8 @@ export const useOrderStore = create<OrderState>((set, get) => ({
           menuItemId: item.id, 
           name: item.name, 
           price: item.price, 
-          quantity 
+          quantity,
+          store_id: item.store_id
         }];
       }
       

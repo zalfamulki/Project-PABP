@@ -36,7 +36,7 @@ export default function OrderHistoryPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-xl font-bold text-foreground">Order #{order.id.slice(-6).toUpperCase()}</h3>
+                      <h3 className="text-xl font-bold text-foreground">Order #{String(order.id).slice(-6).toUpperCase()}</h3>
                       <Badge variant={order.status === "completed" ? "success" : "default"}>
                         {order.status}
                       </Badge>
@@ -57,7 +57,7 @@ export default function OrderHistoryPage() {
                 </div>
 
                 <div className="flex flex-col md:items-end gap-3">
-                  <span className="text-2xl font-black text-foreground">${order.totalAmount.toFixed(2)}</span>
+                  <span className="text-2xl font-black text-foreground">Rp{Number(order.totalAmount || 0).toLocaleString('id-ID')}</span>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" className="rounded-xl gap-2 font-bold group/btn">
                       <Star className="h-4 w-4 text-amber-500 fill-amber-500" />

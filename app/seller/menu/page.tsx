@@ -28,6 +28,7 @@ const menuItemSchema = z.object({
   price: z.coerce.number().min(0.01, "Price must be greater than 0"),
   category: z.string().min(2, "Category is required"),
   imageUrl: z.string().url("Must be a valid image URL"),
+  stock: z.coerce.number().min(0, "Stock cannot be negative"),
 });
 
 type MenuItemFormValues = z.infer<typeof menuItemSchema>;
@@ -46,6 +47,7 @@ export default function MenuManagementPage() {
       price: 0,
       category: "",
       imageUrl: "",
+      stock: 0,
     }
   });
 
@@ -55,7 +57,7 @@ export default function MenuManagementPage() {
 
   const openAddModal = () => {
     setEditingItem(null);
-    reset({ name: "", description: "", price: 0, category: "", imageUrl: "" });
+    reset({ name: "", description: "", price: 0, category: "", imageUrl: "", stock: 0 });
     setIsModalOpen(true);
   };
 
@@ -67,6 +69,7 @@ export default function MenuManagementPage() {
       price: item.price,
       category: item.category,
       imageUrl: item.imageUrl || "",
+      stock: item.stock || 0,
     });
     setIsModalOpen(true);
   };
@@ -138,9 +141,12 @@ export default function MenuManagementPage() {
                 ) : (
                   <ImageIcon className="h-12 w-12 text-text-secondary/20" />
                 )}
-                <div className="absolute top-4 right-4">
-                  <Badge variant={item.isAvailable ? "success" : "default"} className="shadow-lg backdrop-blur-md">
-                    {item.isAvailable ? "Available" : "Unavailable"}
+                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                  <Badge variant={item.isAvailable && (item.stock ?? 0) > 0 ? "success" : "default"} className="shadow-lg backdrop-blur-md">
+                    {item.isAvailable && (item.stock ?? 0) > 0 ? "Available" : "Unavailable"}
+                  </Badge>
+                  <Badge variant="outline" className="bg-surface/80 backdrop-blur-md text-xs">
+                    Stock: {item.stock ?? 0}
                   </Badge>
                 </div>
               </div>
@@ -148,7 +154,7 @@ export default function MenuManagementPage() {
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
-                  <span className="text-lg font-bold text-primary">${item.price.toLocaleString()}</span>
+                  <span className="text-lg font-bold text-primary">Rp{item.price.toLocaleString('id-ID')}</span>
                 </div>
                 <p className="text-sm text-text-secondary line-clamp-2 mb-4 flex-1">{item.description}</p>
                 
@@ -239,6 +245,19 @@ export default function MenuManagementPage() {
                   className="w-full bg-surface-elevated border-border rounded-2xl py-3.5 px-4 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                 />
                 {errors.category && <p className="text-danger text-xs mt-1.5">{errors.category.message}</p>}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-1.5">Available Stock</label>
+                <input
+                  {...register("stock")}
+                  type="number"
+                  placeholder="e.g. 50"
+                  className="w-full bg-surface-elevated border-border rounded-2xl py-3.5 px-4 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                />
+                {errors.stock && <p className="text-danger text-xs mt-1.5">{errors.stock.message}</p>}
               </div>
             </div>
 

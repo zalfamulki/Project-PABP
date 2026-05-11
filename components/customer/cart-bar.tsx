@@ -28,7 +28,7 @@ export function CartBar() {
               </div>
               <div>
                 <p className="text-sm font-medium text-surface/60">Total Amount</p>
-                <p className="text-xl font-bold font-heading text-white">${cartTotal.toFixed(2)}</p>
+                <p className="text-xl font-bold font-heading text-white">Rp{Number(cartTotal || 0).toLocaleString('id-ID')}</p>
               </div>
             </div>
 

@@ -31,12 +31,7 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-10">
-            <a href="#features" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">Features</a>
-            <a href="#solutions" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">Solutions</a>
-            <a href="#pricing" className="text-sm font-bold text-text-secondary hover:text-primary transition-colors">Pricing</a>
-          </div>
-
+       
           <div className="flex items-center gap-4">
             <Link href="/login">
               <Button variant="ghost" className="font-bold text-sm px-6">Log In</Button>
@@ -46,12 +41,12 @@ export default function LandingPage() {
             </Link>
           </div>
         </div>
-      </nav>
+        </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-20 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <motion.div
+        {/* Hero Section */}
+        <section className="relative pt-40 pb-20 px-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
@@ -111,19 +106,6 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-2xl font-bold font-heading text-foreground">Interactive Dashboard</h3>
                 <p className="text-text-secondary mt-3">Ready-to-use interfaces for both Sellers and Customers.</p>
-              </div>
-            </div>
-            
-            {/* Decorative Elements */}
-            <div className="absolute -top-12 -right-12 h-64 w-64 bg-primary/20 blur-[100px] rounded-full -z-10" />
-            <div className="absolute -bottom-12 -left-12 h-64 w-64 bg-orange-400/10 blur-[100px] rounded-full -z-10" />
-            
-            <div className="absolute -right-8 top-1/4 bg-surface p-4 rounded-2xl shadow-xl border border-border animate-bounce duration-[3s]">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-success/20 flex items-center justify-center">
-                  <ShieldCheck className="h-4 w-4 text-success" />
-                </div>
-                <span className="text-xs font-black text-foreground">Payment Secured</span>
               </div>
             </div>
           </motion.div>

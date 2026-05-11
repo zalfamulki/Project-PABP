@@ -30,14 +30,16 @@ export default function SellerDashboard() {
   // Derived stats
   const activeOrders = orders.filter(o => o.status === "pending" || o.status === "preparing");
   const completedToday = orders.filter(o => o.status === "completed").length;
-  const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const totalRevenue = orders
+    .filter(o => o.status === "completed")
+    .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
   const avgWaitTime = 12; // Mock value
 
   return (
     <DashboardLayout allowedRole="seller">
       <div className="space-y-8">
         {/* Page Header */}
-        <div className="flex items-end justify-between">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold font-heading text-foreground">Overview</h1>
             <p className="text-text-secondary mt-1">Here's what's happening in your shop today.</p>
@@ -52,7 +54,7 @@ export default function SellerDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Total Revenue"
-            value={`$${totalRevenue.toFixed(2)}`}
+            value={`Rp${Number(totalRevenue).toLocaleString('id-ID')}`}
             icon={DollarSign}
             trend={{ value: 12, isUp: true }}
             color="success"
@@ -107,7 +109,7 @@ export default function SellerDashboard() {
           </div>
 
           {/* Queue Gauge Section */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <h2 className="text-xl font-bold font-heading text-foreground">Queue Capacity</h2>
             <QueueGauge 
               current={activeOrders.length} 

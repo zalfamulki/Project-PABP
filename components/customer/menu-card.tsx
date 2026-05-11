@@ -21,7 +21,10 @@ export function MenuCard({ item }: MenuCardProps) {
     setQuantity(1); // Reset local quantity
   };
 
-  if (!item.isAvailable) {
+  const isOutOfStock = (item.stock ?? 0) <= 0;
+  const isUnavailable = !item.isAvailable || isOutOfStock;
+
+  if (isUnavailable) {
     return (
       <Card className="overflow-hidden opacity-60 grayscale-[0.3]">
         <div className="relative h-48 bg-surface-elevated flex items-center justify-center">
@@ -31,7 +34,9 @@ export function MenuCard({ item }: MenuCardProps) {
             <ImageIcon className="h-10 w-10 text-text-secondary/20" />
           )}
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <span className="text-white font-bold px-4 py-2 bg-black/60 rounded-full text-sm">Unavailable</span>
+            <span className="text-white font-bold px-4 py-2 bg-black/60 rounded-full text-sm">
+              {isOutOfStock ? "Sold Out" : "Unavailable"}
+            </span>
           </div>
         </div>
         <div className="p-5">
@@ -52,14 +57,17 @@ export function MenuCard({ item }: MenuCardProps) {
         )}
         <div className="absolute bottom-3 left-3">
           <span className="bg-white/90 backdrop-blur-sm text-foreground font-bold px-3 py-1.5 rounded-xl text-sm shadow-sm">
-            ${item.price.toLocaleString()}
+            Rp{item.price.toLocaleString('id-ID')}
           </span>
         </div>
       </div>
 
       <div className="p-5 flex-1 flex flex-col">
         <div className="mb-4">
-          <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{item.category}</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{item.category}</span>
+            <span className="text-[10px] font-bold text-text-secondary uppercase">Stock: {item.stock}</span>
+          </div>
           <h3 className="text-lg font-bold text-foreground mt-0.5">{item.name}</h3>
           <p className="text-sm text-text-secondary line-clamp-2 mt-1.5 leading-relaxed">{item.description}</p>
         </div>
@@ -74,7 +82,7 @@ export function MenuCard({ item }: MenuCardProps) {
             </button>
             <span className="w-8 text-center text-sm font-bold">{quantity}</span>
             <button 
-              onClick={() => setQuantity(quantity + 1)}
+              onClick={() => setQuantity(Math.min(item.stock ?? 1, quantity + 1))}
               className="p-1.5 hover:bg-surface rounded-lg transition-colors text-text-secondary"
             >
               <Plus className="h-4 w-4" />

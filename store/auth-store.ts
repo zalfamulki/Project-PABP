@@ -8,40 +8,63 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, role: "seller" | "customer") => Promise<void>;
-  logout: () => void;
+  login: (email: string, password: string, role: string) => Promise<void>;
+  register: (userData: any) => Promise<void>;
+  logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
       isLoading: false,
 
-      login: async (email, role) => {
+      login: async (email, password, role) => {
         set({ isLoading: true });
         try {
-          const { user, token } = await api.auth.login(email, role);
+          const { user, token } = await api.auth.login(email, password, role);
           set({ user, token, isAuthenticated: true });
+        } catch (error) {
+          set({ user: null, token: null, isAuthenticated: false });
+          throw error;
         } finally {
           set({ isLoading: false });
         }
       },
 
-      logout: () => {
-        set({ user: null, token: null, isAuthenticated: false });
+      register: async (userData) => {
+        set({ isLoading: true });
+        try {
+          const { user, token } = await api.auth.register(userData);
+          set({ user, token, isAuthenticated: true });
+        } catch (error) {
+          set({ user: null, token: null, isAuthenticated: false });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      logout: async () => {
+        try {
+          await api.auth.logout();
+        } finally {
+          set({ user: null, token: null, isAuthenticated: false });
+        }
       },
 
       checkAuth: async () => {
+        const { token } = get();
+        if (!token) return;
+        
         set({ isLoading: true });
         try {
-          // Attempt to fetch current user profile
           const user = await api.auth.me();
           set({ user, isAuthenticated: true });
-        } catch {
+        } catch (error) {
           set({ user: null, token: null, isAuthenticated: false });
         } finally {
           set({ isLoading: false });

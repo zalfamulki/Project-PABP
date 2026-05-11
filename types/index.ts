@@ -5,6 +5,11 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  store?: {
+    id: number;
+    store_name: string;
+    location: string;
+  };
 }
 
 export interface MenuItem {
@@ -15,9 +20,11 @@ export interface MenuItem {
   category: string;
   imageUrl: string;
   isAvailable: boolean;
+  stock?: number;
+  store_id?: number;
 }
 
-export type OrderStatus = "pending" | "preparing" | "ready" | "completed";
+export type OrderStatus = "pending" | "preparing" | "ready" | "completed" | "cancelled";
 
 export interface OrderItem {
   id: string;
@@ -25,6 +32,7 @@ export interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  store_id?: number;
 }
 
 export interface Order {

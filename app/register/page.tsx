@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
 import { MonitorPlay, Mail, Lock, ArrowRight, Store, User, UserPlus } from "lucide-react";
+import { useAuthStore } from "@/store/auth-store";
 import { toast } from "@/store/toast-store";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/loading";
@@ -40,16 +41,16 @@ export default function RegisterPage() {
 
   const selectedRole = watch("role");
 
+  const registerUser = useAuthStore((state) => state.register);
+
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // In a real app, call api.auth.register
-      console.log("Registering:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API call
-      toast.success("Account created successfully! Please login.");
-      router.push("/login");
+      await registerUser(data);
+      toast.success("Account created successfully!");
+      router.push(data.role === "seller" ? "/seller" : "/customer");
     } catch (error) {
-      toast.error("Registration failed. Email might already be in use.");
+      toast.error("Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +122,7 @@ export default function RegisterPage() {
                   <input
                     {...register("name")}
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Masukan Nama Anda"
                     className="w-full bg-surface-elevated border-border rounded-2xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                   />
                 </div>
