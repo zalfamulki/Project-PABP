@@ -97,19 +97,20 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     }
   },
 
-  placeOrder: async (notes) => {
-    const { cart, cartTotal, clearCart } = get();
+  placeOrder: async (notes?: string) => {
+    const { cart, clearCart } = get();
     if (cart.length === 0) throw new Error("Cart is empty");
-    
+
     set({ isLoading: true });
     try {
-      const newOrder = await api.orders.create({
+      const response = await api.orders.create({
         items: cart,
-        totalAmount: cartTotal,
+        totalAmount: 0, // Backend calculates this now based on subtotal
         notes
       });
+      // response.data is now an array of orders
       clearCart();
-      return newOrder;
+      return response.data[0]; // Returning the first one as a default, or handle as needed
     } finally {
       set({ isLoading: false });
     }
