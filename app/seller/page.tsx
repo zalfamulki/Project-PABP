@@ -17,9 +17,10 @@ import { useOrderStore } from "@/store/order-store";
 import { useQueueStore } from "@/store/queue-store";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/utils";
 
 export default function SellerDashboard() {
-  const { orders, fetchOrders, updateOrderStatus } = useOrderStore();
+  const { orders, fetchOrders, updateOrderStatus, deleteOrderHistory } = useOrderStore();
   const { fetchStats } = useQueueStore();
 
   useEffect(() => {
@@ -54,7 +55,7 @@ export default function SellerDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Total Revenue"
-            value={`Rp${Number(totalRevenue).toLocaleString('id-ID')}`}
+            value={formatCurrency(Number(totalRevenue))}
             icon={DollarSign}
             trend={{ value: 12, isUp: true }}
             color="success"
@@ -97,6 +98,7 @@ export default function SellerDashboard() {
                   key={order.id} 
                   order={order} 
                   onStatusChange={updateOrderStatus}
+                  onDelete={deleteOrderHistory}
                 />
               ))}
               {activeOrders.length === 0 && (

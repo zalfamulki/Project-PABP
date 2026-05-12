@@ -8,7 +8,8 @@ import { useQueueStore } from "@/store/queue-store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw, Bell, Share2, HelpCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import { Price } from "@/components/ui/price";
 
 export default function QueueTrackingPage() {
   const { orders, fetchOrders } = useOrderStore();
@@ -95,14 +96,7 @@ export default function QueueTrackingPage() {
             </Card>
 
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="flex-col gap-2 h-24 rounded-3xl border-border hover:bg-surface-elevated">
-                <Share2 className="h-5 w-5 text-primary" />
-                <span className="text-xs font-bold text-text-secondary uppercase">Share Link</span>
-              </Button>
-              <Button variant="outline" className="flex-col gap-2 h-24 rounded-3xl border-border hover:bg-surface-elevated">
-                <HelpCircle className="h-5 w-5 text-primary" />
-                <span className="text-xs font-bold text-text-secondary uppercase">Need Help?</span>
-              </Button>
+            
             </div>
 
             <Card className="p-6 border-dashed border-2 border-border bg-transparent">
@@ -111,12 +105,12 @@ export default function QueueTrackingPage() {
                 {latestOrder.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between text-sm">
                     <span className="text-text-secondary"><span className="font-bold text-foreground">x{item.quantity}</span> {item.name}</span>
-                    <span className="font-bold text-foreground">Rp{(Number(item.price || 0) * Number(item.quantity || 0)).toLocaleString('id-ID')}</span>
+                    <Price amount={Number(item.price || 0) * Number(item.quantity || 0)} className="font-bold text-foreground" />
                   </div>
                 ))}
                 <div className="pt-3 border-t border-border flex justify-between font-black text-lg text-foreground">
                   <span>Total Paid</span>
-                  <span>Rp{Number(latestOrder.totalAmount || 0).toLocaleString('id-ID')}</span>
+                  <Price amount={Number(latestOrder.totalAmount || 0)} />
                 </div>
               </div>
             </Card>

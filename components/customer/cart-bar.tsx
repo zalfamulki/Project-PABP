@@ -1,6 +1,8 @@
 "use client";
 
 import { useOrderStore } from "@/store/order-store";
+import { formatCurrency } from "@/lib/utils";
+import { Price } from "@/components/ui/price";
 import { ShoppingBag, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -27,8 +29,8 @@ export function CartBar() {
                 </span>
               </div>
               <div>
-                <p className="text-sm font-medium text-surface/60">Total Amount</p>
-                <p className="text-xl font-bold font-heading text-white">Rp{Number(cartTotal || 0).toLocaleString('id-ID')}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-surface/40">Checkout Total</p>
+                <Price amount={Number(cartTotal || 0)} className="text-xl text-white" />
               </div>
             </div>
 

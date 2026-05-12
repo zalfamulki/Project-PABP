@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { ToastContainer } from "@/components/ui/toast";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -30,7 +29,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         {children}
-        <ToastContainer />
       </body>
     </html>
   );

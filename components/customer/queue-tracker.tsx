@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Timer, Users, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,7 +10,7 @@ interface QueueTrackerProps {
   position: number;
   totalInQueue: number;
   estimatedTime: number; // in minutes
-  status: "pending" | "preparing" | "ready" | "completed";
+  status: "pending" | "preparing" | "ready" | "completed" | "cancelled";
 }
 
 const steps = [
@@ -19,15 +20,35 @@ const steps = [
 ];
 
 export function QueueTracker({ position, totalInQueue, estimatedTime, status }: QueueTrackerProps) {
+  const [remainingSeconds, setRemainingSeconds] = useState(estimatedTime * 60);
   const currentStepIndex = steps.findIndex(s => s.id === status);
   const isCompleted = status === "completed";
+  const isCancelled = status === "cancelled";
+
+  useEffect(() => {
+    if (status === "completed" || status === "cancelled" || remainingSeconds <= 0) return;
+
+    const timer = setInterval(() => {
+      setRemainingSeconds(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [status, remainingSeconds]);
+
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  const progress = ((estimatedTime * 60 - remainingSeconds) / (estimatedTime * 60)) * 100;
 
   return (
     <Card className="p-8 space-y-8 overflow-hidden relative">
       {/* Header Info */}
       <div className="flex flex-col items-center text-center">
         <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center mb-6 relative">
-          <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin duration-[3s]" />
+          <motion.div 
+            className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
           <span className="text-4xl font-bold font-heading text-primary">#{position}</span>
         </div>
         <h2 className="text-2xl font-bold font-heading text-foreground">Your Queue Position</h2>
@@ -47,8 +68,6 @@ export function QueueTracker({ position, totalInQueue, estimatedTime, status }: 
         <div className="flex justify-between">
           {steps.map((step, idx) => {
             const isActive = idx <= currentStepIndex;
-            const isCurrent = idx === currentStepIndex;
-            
             return (
               <div key={step.id} className="flex flex-col items-center gap-3">
                 <div className={cn(
@@ -72,25 +91,28 @@ export function QueueTracker({ position, totalInQueue, estimatedTime, status }: 
       {/* Footer Info */}
       <div className="bg-surface-elevated rounded-2xl p-6 grid grid-cols-2 gap-4">
         <div className="text-center border-r border-border">
-          <p className="text-[10px] font-bold text-text-secondary uppercase mb-1">Est. Wait Time</p>
-          <div className="flex items-center justify-center gap-1.5 text-foreground font-bold">
-            <Timer className="h-4 w-4 text-primary" />
-            <span>{estimatedTime} mins</span>
+          <p className="text-[10px] font-bold text-text-secondary uppercase mb-1">Time Remaining</p>
+          <div className="flex items-center justify-center gap-1.5 text-foreground font-bold text-lg">
+            <Timer className="h-5 w-5 text-primary" />
+            <motion.span 
+              key={remainingSeconds}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+            </motion.span>
           </div>
         </div>
         <div className="text-center">
           <p className="text-[10px] font-bold text-text-secondary uppercase mb-1">Current Status</p>
           <p className={cn(
             "font-bold capitalize",
-            isCompleted ? "text-success" : "text-primary"
+            isCompleted ? "text-success" : isCancelled ? "text-danger" : "text-primary"
           )}>
             {status}
           </p>
         </div>
       </div>
-
-      {/* Glow Effect */}
-      <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
     </Card>
   );
 }

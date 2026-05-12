@@ -5,16 +5,27 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { useOrderStore } from "@/store/order-store";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, Calendar, ArrowRight, Star } from "lucide-react";
+import { ShoppingBag, Calendar, ArrowRight, Star, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Price } from "@/components/ui/price";
+import { toast } from "@/store/toast-store";
 
 export default function OrderHistoryPage() {
-  const { orders, fetchOrders, isLoading } = useOrderStore();
+  const { orders, fetchOrders, isLoading, deleteOrderHistory } = useOrderStore();
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteOrderHistory(id);
+      toast.success("Order removed from history");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to remove order history");
+    }
+  };
 
   const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -28,7 +39,7 @@ export default function OrderHistoryPage() {
 
         <div className="space-y-6">
           {sortedOrders.map((order) => (
-            <Card key={order.id} className="p-6 overflow-hidden group hover:border-primary/30 transition-all">
+            <Card key={order.id} className="p-6 overflow-hidden group hover:border-primary/30 transition-all relative">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-start gap-5">
                   <div className="h-16 w-16 rounded-2xl bg-surface-elevated flex items-center justify-center text-text-secondary shrink-0 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
@@ -57,15 +68,20 @@ export default function OrderHistoryPage() {
                 </div>
 
                 <div className="flex flex-col md:items-end gap-3">
-                  <span className="text-2xl font-black text-foreground">Rp{Number(order.totalAmount || 0).toLocaleString('id-ID')}</span>
-                  <div className="flex gap-2">
+                  <Price amount={Number(order.totalAmount || 0)} className="text-2xl" />
+                  <div className="flex flex-wrap gap-2 justify-end">
                     <Button variant="outline" size="sm" className="rounded-xl gap-2 font-bold group/btn">
                       <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
                       Rate Order
                     </Button>
-                    <Button size="sm" className="rounded-xl gap-2 font-bold group/btn">
-                      Reorder
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="rounded-xl gap-2 font-bold text-danger hover:bg-danger/10"
+                      onClick={() => handleDelete(order.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete History
                     </Button>
                   </div>
                 </div>

@@ -7,13 +7,23 @@ import { useOrderStore } from "@/store/order-store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Search, Filter, RotateCcw, ShoppingBag } from "lucide-react";
+import { toast } from "@/store/toast-store";
 
 type OrderFilter = "all" | "pending" | "preparing" | "ready" | "completed";
 
 export default function SellerOrdersPage() {
-  const { orders, fetchOrders, updateOrderStatus, isLoading } = useOrderStore();
+  const { orders, fetchOrders, updateOrderStatus, deleteOrderHistory, isLoading } = useOrderStore();
   const [filter, setFilter] = useState<OrderFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteOrderHistory(id);
+      toast.success("Order removed from history");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to remove order");
+    }
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -94,6 +104,7 @@ export default function SellerOrdersPage() {
               key={order.id} 
               order={order} 
               onStatusChange={updateOrderStatus} 
+              onDelete={handleDelete}
             />
           ))}
 

@@ -17,49 +17,68 @@ export function QueueGauge({ current, total, label, className }: QueueGaugeProps
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className={cn("relative flex flex-col items-center justify-center p-6 bg-surface border border-border rounded-3xl overflow-hidden", className)}>
-      {/* Background Ring */}
-      <svg className="h-48 w-48 -rotate-90">
+    <div className={cn("relative flex flex-col items-center justify-center p-8 bg-surface border border-border rounded-[2.5rem] overflow-hidden shadow-sm group", className)}>
+      {/* Background patterns */}
+      <div className="absolute inset-0 bg-grid opacity-[0.2] pointer-events-none" />
+      
+      {/* SVG Gauge */}
+      <svg className="h-56 w-56 -rotate-90 relative z-10">
+        <defs>
+          <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="var(--color-primary)" />
+            <stop offset="100%" stopColor="var(--color-primary-hover)" />
+          </linearGradient>
+        </defs>
         <circle
-          cx="96"
-          cy="96"
+          cx="112"
+          cy="112"
           r={radius}
           fill="transparent"
           stroke="currentColor"
-          strokeWidth="12"
+          strokeWidth="16"
           className="text-surface-elevated"
         />
         {/* Progress Ring */}
         <motion.circle
-          cx="96"
-          cy="96"
+          cx="112"
+          cy="112"
           r={radius}
           fill="transparent"
-          stroke="var(--color-primary)"
-          strokeWidth="12"
+          stroke="url(#gaugeGradient)"
+          strokeWidth="16"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
+          transition={{ duration: 2, ease: "backOut" }}
           strokeLinecap="round"
+          className="drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]"
         />
       </svg>
 
       {/* Center Text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pt-8">
-        <span className="text-4xl font-bold font-heading text-foreground">{current}</span>
-        <span className="text-sm font-medium text-text-secondary uppercase tracking-wider">{label}</span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pt-8 z-20">
+        <motion.span 
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="text-5xl font-black font-heading text-foreground tracking-tighter"
+        >
+          {current}
+        </motion.span>
+        <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] mt-1">{label}</span>
       </div>
 
       {/* Total Info */}
-      <div className="mt-4 text-center">
-        <p className="text-sm text-text-secondary">
-          <span className="font-bold text-foreground">{total - current}</span> slots remaining
-        </p>
+      <div className="mt-6 text-center relative z-20">
+        <div className="px-4 py-2 bg-surface-elevated rounded-full border border-border inline-flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
+          <p className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+            <span className="text-foreground">{total - current}</span> slots left
+          </p>
+        </div>
       </div>
 
-      {/* Decorative Glow */}
-      <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-primary/10 blur-3xl rounded-full" />
+      {/* Interactive Hover Glow */}
+      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/[0.02] transition-colors duration-500" />
     </div>
   );
 }

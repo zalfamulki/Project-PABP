@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,14 @@ export function StoreSettings() {
   const [storeName, setStoreName] = useState(user?.store?.store_name || "");
   const [location, setLocation] = useState(user?.store?.location || "");
   const [phone, setPhone] = useState(user?.store?.phone || "");
+
+  useEffect(() => {
+    if (user?.store) {
+      setStoreName(user.store.store_name || "");
+      setLocation(user.store.location || "");
+      setPhone(user.store.phone || "");
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

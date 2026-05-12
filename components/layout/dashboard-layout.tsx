@@ -3,10 +3,10 @@
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { useAuthStore } from "@/store/auth-store";
-import { ToastContainer } from "@/components/ui/toast";
 import { PageLoader } from "@/components/ui/loading";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,6 +16,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children, allowedRole }: DashboardLayoutProps) {
   const { user, isAuthenticated, isLoading } = useAuthStore();
   const [isMounted, setIsMounted] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,17 +42,27 @@ export function DashboardLayout({ children, allowedRole }: DashboardLayoutProps)
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar role={user?.role as "seller" | "customer"} />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <div className="max-w-7xl mx-auto">
+    <div className="flex h-screen w-screen bg-background overflow-hidden relative">
+      {/* Subtle background element */}
+      <div className="absolute inset-0 bg-grid opacity-[0.4] pointer-events-none" />
+      
+      <Sidebar 
+        role={user?.role as "seller" | "customer"} 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+      
+      <div className="flex-1 flex flex-col min-w-0 h-full relative z-10">
+        <Header onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className={cn(
+            "max-w-[1600px] mx-auto px-4 py-6 md:px-8 md:py-10 transition-all duration-500",
+            "w-full h-full"
+          )}>
             {children}
           </div>
         </main>
       </div>
-      <ToastContainer />
     </div>
   );
 }

@@ -16,19 +16,19 @@
   --color-border: #E2E8F0;
   --color-text-secondary: #64748B;
   
-  --radius: 0.75rem;
+  --radius: 1rem;
 
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0B1120;
-    --foreground: #F1F5F9;
+    --background: #0F172A;
+    --foreground: #F8FAFC;
     
-    --color-surface: #131B2E;
-    --color-surface-elevated: #1A2438;
+    --color-surface: #1E293B;
+    --color-surface-elevated: #334155;
     
     --color-primary: #FBBF24;
     --color-primary-hover: #F59E0B;
@@ -36,11 +36,11 @@
     --color-success: #34D399;
     --color-danger: #F87171;
     
-    --color-border: #1E293B;
+    --color-border: #334155;
     --color-text-secondary: #94A3B8;
 
-    --glass-bg: rgba(19, 27, 46, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -58,8 +58,8 @@
   
   --radius: var(--radius);
 
-  --font-sans: var(--font-dm-sans);
-  --font-heading: var(--font-outfit);
+  --font-sans: "DM Sans", sans-serif;
+  --font-heading: "Outfit", sans-serif;
 }
 
 body {
@@ -78,18 +78,44 @@ body {
   border: 1px solid var(--glass-border);
 }
 
+.glass-dark {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 4px;
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-secondary);
+}
+
+/* Subtle background pattern */
+.bg-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }

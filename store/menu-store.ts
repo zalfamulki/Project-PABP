@@ -22,6 +22,8 @@ export const useMenuStore = create<MenuState>((set, get) => ({
     try {
       const menu = await api.menu.getAll();
       set({ menu });
+    } catch (error) {
+      console.error("Failed to fetch menu:", error);
     } finally {
       set({ isLoading: false });
     }
@@ -81,6 +83,9 @@ export const useMenuStore = create<MenuState>((set, get) => ({
         menu: state.menu.map((m) => (m.id === id ? updatedItem : m)),
       }));
       toast.info(`${item.name} is now ${!item.isAvailable ? 'available' : 'unavailable'}`);
+    } catch (error) {
+      console.error("Failed to toggle availability:", error);
+      toast.error("Action failed");
     } finally {
       set({ isLoading: false });
     }

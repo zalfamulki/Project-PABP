@@ -10,21 +10,21 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50"
+    const baseStyles = "inline-flex items-center justify-center rounded-[1rem] font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 disabled:pointer-events-none disabled:opacity-50 active:scale-95 select-none"
     
     const variants = {
-      primary: "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] shadow-lg shadow-amber-500/20",
-      secondary: "bg-[var(--color-surface-elevated)] text-[var(--foreground)] hover:bg-[var(--color-border)]",
-      outline: "border-2 border-[var(--color-border)] bg-transparent hover:bg-[var(--color-surface-elevated)]",
-      ghost: "hover:bg-[var(--color-surface-elevated)] hover:text-[var(--foreground)]",
-      danger: "bg-[var(--color-danger)] text-white hover:bg-red-600 shadow-lg shadow-red-500/20",
-      success: "bg-[var(--color-success)] text-white hover:opacity-90 shadow-lg shadow-emerald-500/20",
+      primary: "bg-primary text-white hover:bg-primary-hover shadow-xl shadow-primary/20 border border-primary/20",
+      secondary: "bg-surface-elevated text-foreground hover:bg-border border border-border/50",
+      outline: "border-2 border-border bg-transparent hover:bg-surface-elevated hover:border-primary/30 text-text-secondary hover:text-primary",
+      ghost: "text-text-secondary hover:bg-surface-elevated hover:text-foreground",
+      danger: "bg-danger text-white hover:bg-red-600 shadow-xl shadow-danger/20 border border-danger/20",
+      success: "bg-success text-white hover:opacity-90 shadow-xl shadow-success/20 border border-success/20",
     }
     
     const sizes = {
-      sm: "h-9 px-4 text-xs",
-      md: "h-11 px-6 text-sm",
-      lg: "h-14 px-8 text-base",
+      sm: "h-10 px-5 text-xs uppercase tracking-widest",
+      md: "h-12 px-7 text-sm",
+      lg: "h-16 px-10 text-lg",
     }
 
     return (

@@ -52,17 +52,17 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest mb-8">
-              <Zap className="h-3.5 w-3.5 fill-primary" />
-              The Future of F&B is here
+              
+             Masa depan FnB ada  disini
             </div>
             
             <h1 className="text-6xl md:text-7xl font-black font-heading text-foreground leading-[1.1] tracking-tight">
-              Wait less, <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">Eat more.</span>
+             Solusi, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">Antrian Modern.</span>
             </h1>
             
             <p className="text-xl text-text-secondary mt-8 leading-relaxed max-w-xl">
-              Eliminate physical queues and optimize your restaurant's flow with SmartQueue. Real-time tracking, seamless ordering, and powerful analytics.
+              sistem pre-order dan antrian adaptif berbasis   multiplatform yang dirancang untuk membantu UMKM kuliner mengelola pesanan secara lebih efisien dan modern. Aplikasi ini memungkinkan pelanggan melakukan pemesanan makanan secara online, memantau posisi antrian, serta mendapatkan estimasi waktu pesanan secara real-time.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-12">
@@ -72,9 +72,7 @@ export default function LandingPage() {
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
-              <Button variant="outline" className="w-full sm:w-auto h-16 px-10 text-lg rounded-2xl border-2 hover:bg-surface-elevated transition-all">
-                View Live Demo
-              </Button>
+          
             </div>
 
             <div className="flex items-center gap-8 mt-12 pt-12 border-t border-border">
@@ -86,8 +84,8 @@ export default function LandingPage() {
                 ))}
               </div>
               <div className="text-sm">
-                <p className="font-bold text-foreground">5,000+ Merchants</p>
-                <p className="text-text-secondary">Trusting SmartQueue daily</p>
+                <p className="font-bold text-foreground">500+ UMKM</p>
+                <p className="text-text-secondary">UMKM yang terbantu</p>
               </div>
             </div>
           </motion.div>
@@ -104,8 +102,8 @@ export default function LandingPage() {
                 <div className="h-20 w-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
                   <Smartphone className="h-10 w-10 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold font-heading text-foreground">Interactive Dashboard</h3>
-                <p className="text-text-secondary mt-3">Ready-to-use interfaces for both Sellers and Customers.</p>
+                <h3 className="text-2xl font-bold font-heading text-foreground">Dashboard Interaktif</h3>
+                <p className="text-text-secondary mt-3">Interface siap pakai untuk Penjual dan Pelanggan .</p>
               </div>
             </div>
           </motion.div>
@@ -116,15 +114,15 @@ export default function LandingPage() {
       <section id="features" className="py-32 bg-surface-elevated/50 border-y border-border">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl md:text-5xl font-black font-heading text-foreground mb-6">Built for Modern F&B</h2>
-            <p className="text-xl text-text-secondary">Everything you need to manage orders and keep customers happy.</p>
+            <h2 className="text-4xl md:text-5xl font-black font-heading text-foreground mb-6">Dirancang Untuk UMKM Modern</h2>
+            <p className="text-xl text-text-secondary">Semua yang anda butuhkan untuk mengelola pesanan dan menjaga kepuasan pelanggan .</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Zap, title: "Zero Lag", desc: "Real-time order synchronization across all devices instantly." },
-              { icon: Clock, title: "Smart Est.", desc: "Automated wait-time calculation based on queue density." },
-              { icon: Store, title: "Multi-Store", desc: "Manage multiple branches from a single unified dashboard." }
+              { icon: Zap, title: "Tanpa Lag", desc: "sinkronisasi pesanan real-time di semua perangkat secara instan." },
+              { icon: Clock, title: "Estimasi Cerdas", desc: "kalkulasi waktu tunggu otomatis berdasarkan kepadatan antrian." },
+              { icon: Store, title: "Multi-Store", desc: "kelola berbagai cabang dari satu dashboard terpadu." }
             ].map((feature, i) => (
               <div key={i} className="p-10 bg-surface rounded-[2rem] border border-border hover:border-primary/50 transition-all hover:shadow-xl group">
                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform">
@@ -152,11 +150,7 @@ export default function LandingPage() {
           
           <p className="text-sm text-text-secondary">© 2026 SmartQueue F&B+. All rights reserved.</p>
           
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-sm font-bold text-text-secondary hover:text-primary">Twitter</a>
-            <a href="#" className="text-sm font-bold text-text-secondary hover:text-primary">Instagram</a>
-            <a href="#" className="text-sm font-bold text-text-secondary hover:text-primary">Support</a>
-          </div>
+  
         </div>
       </footer>
     </div>

@@ -17,6 +17,7 @@ interface OrderState {
   fetchOrders: () => Promise<void>;
   placeOrder: (notes?: string) => Promise<Order>;
   updateOrderStatus: (id: string, status: Order["status"]) => Promise<void>;
+  deleteOrderHistory: (id: string) => Promise<void>;
 }
 
 export const useOrderStore = create<OrderState>((set, get) => ({
@@ -92,6 +93,9 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     try {
       const orders = await api.orders.getAll();
       set({ orders });
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+      // Optional: set orders to empty or handle error state
     } finally {
       set({ isLoading: false });
     }
@@ -110,7 +114,10 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       });
       // response.data is now an array of orders
       clearCart();
-      return response.data[0]; // Returning the first one as a default, or handle as needed
+      return response; // api.orders.create returns a single Order object
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      throw error;
     } finally {
       set({ isLoading: false });
     }
@@ -123,6 +130,24 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       set((state) => ({
         orders: state.orders.map((o) => (o.id === id ? updatedOrder : o))
       }));
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  deleteOrderHistory: async (id) => {
+    set({ isLoading: true });
+    try {
+      await api.orders.delete(id);
+      set((state) => ({
+        orders: state.orders.filter((o) => o.id !== id)
+      }));
+    } catch (error) {
+      console.error("Failed to delete order history:", error);
+      throw error;
     } finally {
       set({ isLoading: false });
     }

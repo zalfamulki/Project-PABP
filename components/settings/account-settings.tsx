@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/auth-store";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,14 @@ export function AccountSettings() {
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");
   const [address, setAddress] = useState(user?.address || "");
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setPhone(user.phone || "");
+      setAddress(user.address || "");
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

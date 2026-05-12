@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/store/toast-store";
+import { formatCurrency } from "@/lib/utils";
+import { Price } from "@/components/ui/price";
 
 export default function CartPage() {
   const { cart, cartTotal, updateQuantity, removeFromCart, placeOrder } = useOrderStore();
@@ -70,7 +72,7 @@ export default function CartPage() {
                   <div>
                     <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-primary font-bold">Rp{Number(item.price || 0).toLocaleString('id-ID')}</p>
+                      <Price amount={Number(item.price || 0)} className="text-primary font-bold" />
                       {item.storeName && (
                         <span className="text-[10px] text-text-secondary uppercase font-bold bg-surface-elevated px-2 py-0.5 rounded-lg border border-border">
                           {item.storeName}
@@ -98,7 +100,7 @@ export default function CartPage() {
                   </div>
                   
                   <div className="text-right min-w-[100px]">
-                    <p className="text-lg font-black text-foreground">Rp{(Number(item.price || 0) * Number(item.quantity || 0)).toLocaleString('id-ID')}</p>
+                    <Price amount={Number(item.price || 0) * Number(item.quantity || 0)} className="text-lg text-foreground" />
                     <button 
                       onClick={() => removeFromCart(item.id)}
                       className="text-danger text-sm font-bold mt-1 hover:underline"
@@ -126,7 +128,7 @@ export default function CartPage() {
               <div className="space-y-4">
                 <div className="flex justify-between text-text-secondary font-medium">
                   <span>Subtotal</span>
-                  <span>Rp{Number(cartTotal || 0).toLocaleString('id-ID')}</span>
+                  <Price amount={Number(cartTotal || 0)} />
                 </div>
                 <div className="flex justify-between text-text-secondary font-medium">
                   <span>Queue Fee</span>
@@ -134,7 +136,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-2xl font-black text-foreground pt-4 border-t border-border">
                   <span>Total</span>
-                  <span>Rp{Number(cartTotal || 0).toLocaleString('id-ID')}</span>
+                  <Price amount={Number(cartTotal || 0)} />
                 </div>
               </div>
 

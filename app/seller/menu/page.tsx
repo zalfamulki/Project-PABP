@@ -17,10 +17,11 @@ import {
   EyeOff,
   Image as ImageIcon
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Price } from "@/components/ui/price";
 
 const menuItemSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -132,57 +133,74 @@ export default function MenuManagementPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredMenu.map((item) => (
             <Card key={item.id} className={cn(
-              "overflow-hidden flex flex-col group transition-all duration-300",
+              "overflow-hidden flex flex-col group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 border-border/50 bg-surface/50 backdrop-blur-sm",
               !item.isAvailable && "opacity-75 grayscale-[0.5]"
             )}>
-              <div className="relative h-48 bg-surface-elevated flex items-center justify-center overflow-hidden">
+              <div className="relative h-56 bg-surface-elevated flex items-center justify-center overflow-hidden">
                 {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 ) : (
-                  <ImageIcon className="h-12 w-12 text-text-secondary/20" />
+                  <div className="flex flex-col items-center gap-3 opacity-20">
+                    <ImageIcon className="h-12 w-12" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">No Image</span>
+                  </div>
                 )}
-                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
-                  <Badge variant={item.isAvailable && (item.stock ?? 0) > 0 ? "success" : "default"} className="shadow-lg backdrop-blur-md">
-                    {item.isAvailable && (item.stock ?? 0) > 0 ? "Available" : "Unavailable"}
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="absolute top-4 left-4">
+                  <Badge variant={item.isAvailable && (item.stock ?? 0) > 0 ? "success" : "default"} className="shadow-lg backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    {item.isAvailable && (item.stock ?? 0) > 0 ? "Active" : "Hidden"}
                   </Badge>
-                  <Badge variant="outline" className="bg-surface/80 backdrop-blur-md text-xs">
-                    Stock: {item.stock ?? 0}
-                  </Badge>
+                </div>
+
+                <div className="absolute bottom-4 right-4">
+                  <div className="bg-white/90 backdrop-blur-md text-foreground px-3 py-1.5 rounded-xl border border-border shadow-sm flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary" />
+                    <span className="text-[10px] font-black uppercase">Stock: {item.stock ?? 0}</span>
+                  </div>
                 </div>
               </div>
 
               <div className="p-6 flex-1 flex flex-col">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-foreground">{item.name}</h3>
-                  <span className="text-lg font-bold text-primary">Rp{item.price.toLocaleString('id-ID')}</span>
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1 block">{item.category}</span>
+                    <h3 className="text-xl font-black font-heading text-foreground tracking-tight group-hover:text-primary transition-colors">{item.name}</h3>
+                  </div>
+                  <Price amount={item.price} className="text-lg" />
                 </div>
-                <p className="text-sm text-text-secondary line-clamp-2 mb-4 flex-1">{item.description}</p>
+                <p className="text-sm text-text-secondary line-clamp-2 mb-6 flex-1 leading-relaxed">{item.description}</p>
                 
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">{item.category}</span>
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center justify-between pt-5 border-t border-border/50">
+                  <div className="flex items-center gap-1 bg-surface-elevated rounded-2xl p-1 border border-border/50">
                     <button 
                       onClick={() => toggleAvailability(item.id)}
-                      className="p-2 hover:bg-surface-elevated rounded-xl text-text-secondary hover:text-foreground transition-colors"
+                      className="p-2.5 hover:bg-surface rounded-xl text-text-secondary hover:text-foreground transition-all active:scale-90"
                       title={item.isAvailable ? "Make unavailable" : "Make available"}
                     >
                       {item.isAvailable ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
                     </button>
                     <button 
                       onClick={() => openEditModal(item)}
-                      className="p-2 hover:bg-surface-elevated rounded-xl text-text-secondary hover:text-primary transition-colors"
+                      className="p-2.5 hover:bg-surface rounded-xl text-text-secondary hover:text-primary transition-all active:scale-90"
                       title="Edit item"
                     >
                       <Pencil className="h-5 w-5" />
                     </button>
-                    <button 
-                      onClick={() => deleteMenuItem(item.id)}
-                      className="p-2 hover:bg-danger/10 rounded-xl text-text-secondary hover:text-danger transition-colors"
-                      title="Delete item"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
                   </div>
+
+                  <button 
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to delete this menu item? This action cannot be undone.")) {
+                        deleteMenuItem(item.id);
+                      }
+                    }}
+                    className="p-3 hover:bg-danger/10 rounded-2xl text-text-secondary hover:text-danger transition-all active:scale-90 border border-transparent hover:border-danger/20 shadow-sm hover:shadow-danger/5"
+                    title="Delete item"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
             </Card>

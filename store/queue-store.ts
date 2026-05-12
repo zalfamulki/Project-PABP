@@ -23,6 +23,8 @@ export const useQueueStore = create<QueueState>((set) => ({
     try {
       const stats = await api.queue.getStats();
       set({ stats });
+    } catch (error) {
+      console.error("Failed to fetch queue stats:", error);
     } finally {
       set({ isLoadingStats: false });
     }
@@ -36,6 +38,8 @@ export const useQueueStore = create<QueueState>((set) => ({
     try {
       const { position, estWaitMins } = await api.queue.getPosition(orderId);
       set({ position, estWaitMins });
+    } catch (error) {
+      console.error("Failed to fetch queue position:", error);
     } finally {
       set({ isLoadingPosition: false });
     }

@@ -1,4 +1,4 @@
-import { MenuItem, Order, DashboardStats, QueueData, User } from "@/types";
+import { MenuItem, Order, OrderItem, DashboardStats, QueueData, User } from "@/types";
 import { MOCK_MENU, MOCK_ORDERS, MOCK_STATS } from "./mock-data";
 import { useAuthStore } from "@/store/auth-store";
 
@@ -42,6 +42,22 @@ const handleResponse = async (res: Response) => {
     } catch (e) {
       errorMsg = res.statusText || errorMsg;
     }
+    
+    // Handle 401 Unauthorized globally
+    if (res.status === 401 || errorMsg.toLowerCase() === 'unauthenticated.') {
+      console.warn('Authentication failure detected, clearing session...');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('smartqueue_token');
+        localStorage.removeItem('smartqueue-auth'); // Clear zustand persist as well
+        
+        // Only redirect if not already on login or register
+        if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+          window.location.href = '/login?error=session_expired';
+        }
+      }
+      throw new Error('Unauthenticated');
+    }
+    
     throw new Error(errorMsg);
   }
   return res.json();
@@ -241,6 +257,13 @@ export const api = {
       });
       const data = await handleResponse(res);
       return api.orders.mapOrder(data.data);
+    },
+    delete: async (id: string): Promise<void> => {
+      const res = await fetch(`${API_URL}/orders/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(true)
+      });
+      await handleResponse(res);
     }
   },
   
@@ -253,6 +276,11 @@ export const api = {
       } catch (e) {
         return { totalPending: 0, totalPreparing: 0, averageWaitTimeMins: 0, queueLoad: "low" };
       }
+    },
+    getPosition: async (orderId: string): Promise<{ position: number, estWaitMins: number }> => {
+      // In a real app, this would be an API call
+      // For now, we simulate it or the caller can use the data from fetchOrders
+      return { position: 5, estWaitMins: 25 };
     }
   },
 
