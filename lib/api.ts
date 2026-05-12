@@ -6,7 +6,24 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
 
 const getToken = () => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('smartqueue_token');
+    const storeToken = useAuthStore.getState().token;
+    if (storeToken) {
+      localStorage.setItem('smartqueue_token', storeToken);
+      return storeToken;
+    }
+    const token = localStorage.getItem('smartqueue_token');
+    if (token) return token;
+    const persisted = localStorage.getItem('smartqueue-auth');
+    if (persisted) {
+      try {
+        const parsed = JSON.parse(persisted);
+        const stateToken = parsed?.state?.token;
+        if (stateToken) {
+          localStorage.setItem('smartqueue_token', stateToken);
+          return stateToken;
+        }
+      } catch {}
+    }
   }
   return null;
 };
@@ -46,11 +63,11 @@ const handleResponse = async (res: Response) => {
     // Handle 401 Unauthorized globally
     if (res.status === 401 || errorMsg.toLowerCase() === 'unauthenticated.') {
       console.warn('Authentication failure detected, clearing session...');
+      useAuthStore.setState({ user: null, token: null, isAuthenticated: false });
       if (typeof window !== 'undefined') {
         localStorage.removeItem('smartqueue_token');
-        localStorage.removeItem('smartqueue-auth'); // Clear zustand persist as well
+        localStorage.removeItem('smartqueue-auth');
         
-        // Only redirect if not already on login or register
         if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
           window.location.href = '/login?error=session_expired';
         }
@@ -305,6 +322,31 @@ export const api = {
       });
       const data = await handleResponse(res);
       return data.data;
+    }
+  },
+
+  push: {
+    subscribe: async (subscription: PushSubscriptionJSON): Promise<void> => {
+      const res = await fetch(`${API_URL}/push/subscribe`, {
+        method: 'POST',
+        headers: getHeaders(true),
+        body: JSON.stringify({
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: subscription.keys?.p256dh,
+            auth: subscription.keys?.auth,
+          }
+        })
+      });
+      await handleResponse(res);
+    },
+    unsubscribe: async (endpoint: string): Promise<void> => {
+      const res = await fetch(`${API_URL}/push/unsubscribe`, {
+        method: 'POST',
+        headers: getHeaders(true),
+        body: JSON.stringify({ endpoint })
+      });
+      await handleResponse(res);
     }
   },
 

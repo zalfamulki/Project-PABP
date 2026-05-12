@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
-import { MonitorPlay, Mail, Lock, ArrowRight, Store, User, UserPlus } from "lucide-react";
+import { MonitorPlay, Mail, Lock, ArrowRight, Store, User, UserPlus, CheckCircle2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
 import { toast } from "@/store/toast-store";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
 
   const {
@@ -47,10 +48,14 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       await registerUser(data);
+      setIsSuccess(true);
       toast.success("Account created successfully!");
-      router.push(data.role === "seller" ? "/seller" : "/customer");
-    } catch (error) {
-      toast.error("Registration failed. Please try again.");
+      
+      setTimeout(() => {
+        router.push(data.role === "seller" ? "/seller" : "/customer");
+      }, 1500);
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -167,11 +172,29 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary-hover text-white font-black py-5 rounded-[1.5rem] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95 group/btn overflow-hidden relative"
+              disabled={isLoading || isSuccess}
+              className={cn(
+                "w-full font-black py-5 rounded-[1.5rem] shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-70 active:scale-95 group/btn overflow-hidden relative",
+                isSuccess 
+                  ? "bg-success text-white shadow-success/30" 
+                  : "bg-primary hover:bg-primary-hover text-white shadow-primary/30"
+              )}
             >
               <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-              {isLoading ? <Spinner size="sm" className="border-white" /> : (
+              {isLoading ? (
+                <Spinner size="sm" className="border-white" />
+              ) : isSuccess ? (
+                <>
+                  <span className="uppercase tracking-[0.2em] text-xs">Success!</span>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  >
+                    <CheckCircle2 className="h-5 w-5" />
+                  </motion.div>
+                </>
+              ) : (
                 <>
                   <span className="uppercase tracking-[0.2em] text-xs">Buat Akun</span>
                   <ArrowRight className="h-5 w-5 transition-transform group-hover/btn:translate-x-1" />

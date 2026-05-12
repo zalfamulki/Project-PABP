@@ -70,10 +70,6 @@ export default function OrderHistoryPage() {
                 <div className="flex flex-col md:items-end gap-3">
                   <Price amount={Number(order.totalAmount || 0)} className="text-2xl" />
                   <div className="flex flex-wrap gap-2 justify-end">
-                    <Button variant="outline" size="sm" className="rounded-xl gap-2 font-bold group/btn">
-                      <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                      Rate Order
-                    </Button>
                     <Button 
                       variant="ghost" 
                       size="sm" 

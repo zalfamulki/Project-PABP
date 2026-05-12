@@ -5,15 +5,18 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { QueueTracker } from "@/components/customer/queue-tracker";
 import { useOrderStore } from "@/store/order-store";
 import { useQueueStore } from "@/store/queue-store";
+import { usePushNotification } from "@/hooks/use-push-notification";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Bell, Share2, HelpCircle } from "lucide-react";
+import { RefreshCcw, Bell, BellOff, BellRing, Share2, HelpCircle, Loader2 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Price } from "@/components/ui/price";
+import { toast } from "@/store/toast-store";
 
 export default function QueueTrackingPage() {
   const { orders, fetchOrders } = useOrderStore();
   const { fetchStats, isLoadingStats: isLoading } = useQueueStore();
+  const { isSubscribed, isRegistering, permission, enableNotifications, isSupported } = usePushNotification();
   
   const activeOrders = orders.filter(o => o.status !== "completed" && o.status !== "cancelled");
   const latestOrder = [...activeOrders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
@@ -83,15 +86,55 @@ export default function QueueTrackingPage() {
             <Card className="p-6 space-y-6 bg-primary text-white border-none shadow-xl shadow-primary/20">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-xl font-bold font-heading">Ready to Notify?</h3>
-                  <p className="text-white/80 text-sm mt-2 leading-relaxed">We'll alert you via push notification as soon as your order is ready for pickup.</p>
+                  <h3 className="text-xl font-bold font-heading">
+                    {isSubscribed ? "Notifications Active" : "Ready to Notify?"}
+                  </h3>
+                  <p className="text-white/80 text-sm mt-2 leading-relaxed">
+                    {isSubscribed
+                      ? "You'll get a push notification when your order status changes."
+                      : "We'll alert you via push notification as soon as your order is ready for pickup."}
+                  </p>
                 </div>
                 <div className="p-3 bg-white/20 rounded-2xl">
-                  <Bell className="h-6 w-6" />
+                  {isSubscribed ? <BellRing className="h-6 w-6" /> : <Bell className="h-6 w-6" />}
                 </div>
               </div>
-              <Button className="w-full bg-white text-primary hover:bg-white/90 font-bold h-12 rounded-xl">
-                Enable Notifications
+              <Button
+                className="w-full bg-white text-primary hover:bg-white/90 font-bold h-12 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={isRegistering || !isSupported || permission === "denied"}
+                onClick={async () => {
+                  if (isSubscribed) return;
+                  const success = await enableNotifications();
+                  if (success) {
+                    toast.success("Notifications enabled! You'll be alerted when your order is ready.");
+                  } else if (Notification.permission === "denied") {
+                    toast.error("Notifications blocked. Please enable them in your browser settings.");
+                  } else {
+                    toast.info("Notification permission not granted.");
+                  }
+                }}
+              >
+                {isRegistering ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Setting up...
+                  </>
+                ) : isSubscribed ? (
+                  <>
+                    <BellRing className="h-4 w-4 mr-2" />
+                    Notifications Enabled
+                  </>
+                ) : permission === "denied" ? (
+                  <>
+                    <BellOff className="h-4 w-4 mr-2" />
+                    Notifications Blocked
+                  </>
+                ) : (
+                  <>
+                    <Bell className="h-4 w-4 mr-2" />
+                    Enable Notifications
+                  </>
+                )}
               </Button>
             </Card>
 

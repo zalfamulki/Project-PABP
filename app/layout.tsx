@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans } from "next/font/google";
+import { ToastContainer } from "@/components/ui/toast";
+import { PushNotificationRegistry } from "@/components/push-notification-registry";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -29,6 +31,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         {children}
+        <ToastContainer />
+        <PushNotificationRegistry />
       </body>
     </html>
   );
