@@ -231,7 +231,8 @@ export const api = {
         name: oi.menu?.name || 'Unknown Item',
         price: Number(oi.menu?.price || 0),
         quantity: Number(oi.quantity),
-        store_id: item.store_id
+        store_id: item.store_id,
+        isReady: Boolean(oi.is_ready)
       })),
       totalAmount: Number(item.total_price),
       status: item.status,

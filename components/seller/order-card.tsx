@@ -5,8 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Price } from "@/components/ui/price";
-import { Clock, CheckCircle2, AlertCircle, ShoppingBag, ChevronRight, Trash2 } from "lucide-react";
-import { cn, formatCurrency } from "@/lib/utils";
+import { Clock, CheckCircle2, AlertCircle, ShoppingBag, Trash2, CookingPot, Utensils } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { useState } from "react";
+import { toast } from "@/store/toast-store";
 
 interface OrderCardProps {
   order: Order;
@@ -16,14 +19,40 @@ interface OrderCardProps {
 
 const statusConfig = {
   pending: { label: "Pending", color: "warning" as const, icon: AlertCircle },
-  preparing: { label: "Preparing", color: "info" as const, icon: Clock },
-  ready: { label: "Ready", color: "success" as const, icon: CheckCircle2 },
+  preparing: { label: "Preparing", color: "info" as const, icon: CookingPot },
+  ready: { label: "Ready", color: "success" as const, icon: Utensils },
   completed: { label: "Completed", color: "default" as const, icon: CheckCircle2 },
   cancelled: { label: "Cancelled", color: "danger" as const, icon: AlertCircle },
 };
 
 export function OrderCard({ order, onStatusChange, onDelete }: OrderCardProps) {
   const config = statusConfig[order.status];
+  const [togglingItems, setTogglingItems] = useState<Record<string, boolean>>({});
+
+  const handleToggleReady = async (itemId: string) => {
+    setTogglingItems(prev => ({ ...prev, [itemId]: true }));
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/orders/${order.id}/items/${itemId}/toggle-ready`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('smartqueue_token')}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to toggle item');
+      const data = await res.json();
+      onStatusChange(order.id, data.data.status);
+      toast.success(data.message);
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to update item');
+    } finally {
+      setTogglingItems(prev => ({ ...prev, [itemId]: false }));
+    }
+  };
+
+  const allItemsReady = order.items.every(item => (item as any).isReady);
+  const anyItemReady = order.items.some(item => (item as any).isReady);
 
   return (
     <Card className="overflow-hidden hover:border-primary/50 transition-all duration-300 group hover:shadow-xl hover:shadow-primary/5 bg-surface/50 backdrop-blur-sm border-border/50 relative">
@@ -47,18 +76,54 @@ export function OrderCard({ order, onStatusChange, onDelete }: OrderCardProps) {
 
         {/* Items List */}
         <div className="space-y-4 mb-8">
-          {order.items.map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between text-sm group/item">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-primary/10 text-primary text-[10px] font-black">
-                  {item.quantity}
-                </span>
-                <span className="text-foreground font-bold tracking-tight group-hover/item:text-primary transition-colors">{item.name}</span>
+          {order.items.map((item, idx) => {
+            const isReady = (item as any).isReady;
+            return (
+              <div key={idx} className={cn(
+                "flex items-center justify-between text-sm group/item p-2 rounded-xl transition-colors",
+                order.status === "preparing" && "hover:bg-surface-elevated cursor-pointer",
+                isReady && "bg-success/5"
+              )}>
+                <div className="flex items-center gap-3 flex-1" onClick={() => order.status === "preparing" && handleToggleReady(item.id)}>
+                  <span className={cn(
+                    "flex items-center justify-center h-6 min-w-6 rounded-lg text-[10px] font-black transition-colors",
+                    isReady ? "bg-success text-white" : "bg-primary/10 text-primary"
+                  )}>
+                    {isReady ? <CheckCircle2 className="h-3 w-3" /> : item.quantity}
+                  </span>
+                  <span className={cn(
+                    "font-bold tracking-tight transition-colors",
+                    isReady ? "text-success line-through opacity-60" : "text-foreground"
+                  )}>
+                    {item.name}
+                  </span>
+                  {order.status === "preparing" && (
+                    <span className="text-[10px] text-text-secondary ml-1">
+                      {togglingItems[item.id] ? "..." : (isReady ? "tap to undo" : "tap when ready")}
+                    </span>
+                  )}
+                </div>
+                <Price amount={Number(item.price || 0) * Number(item.quantity || 0)} className={cn("font-medium", isReady ? "text-success/60" : "text-text-secondary")} />
               </div>
-              <Price amount={Number(item.price || 0) * Number(item.quantity || 0)} className="text-text-secondary font-medium" />
-            </div>
-          ))}
+            );
+          })}
         </div>
+
+        {/* Preparing progress bar */}
+        {order.status === "preparing" && (
+          <div className="mb-4">
+            <div className="flex justify-between text-[10px] font-bold text-text-secondary mb-1.5">
+              <span>Preparation Progress</span>
+              <span>{order.items.filter(i => (i as any).isReady).length}/{order.items.length} ready</span>
+            </div>
+            <div className="h-2 rounded-full bg-surface-elevated overflow-hidden">
+              <div
+                className="h-full rounded-full bg-success transition-all duration-500"
+                style={{ width: `${(order.items.filter(i => (i as any).isReady).length / order.items.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="pt-6 border-t border-border/50 flex flex-col gap-6">
@@ -74,18 +139,25 @@ export function OrderCard({ order, onStatusChange, onDelete }: OrderCardProps) {
                   Cancel
                 </Button>
                 <Button size="sm" className="flex-[2] rounded-xl text-xs font-bold shadow-lg shadow-primary/20" onClick={() => onStatusChange(order.id, "preparing")}>
-                  Accept Order
+                  Accept
                 </Button>
               </>
             )}
-            {order.status === "preparing" && (
-              <Button size="sm" variant="secondary" className="w-full rounded-xl text-xs font-bold shadow-lg shadow-success/10" onClick={() => onStatusChange(order.id, "ready")}>
-                Mark as Ready
+            {order.status === "preparing" && !allItemsReady && (
+              <div className="w-full text-center">
+                <p className="text-[10px] text-text-secondary font-bold uppercase tracking-wider">
+                  Tap each item when ready
+                </p>
+              </div>
+            )}
+            {order.status === "preparing" && allItemsReady && (
+              <Button size="sm" className="w-full rounded-xl text-xs font-bold bg-success hover:bg-success/90 shadow-lg shadow-success/20" onClick={() => onStatusChange(order.id, "ready")}>
+                Ready — All Items Done
               </Button>
             )}
             {order.status === "ready" && (
               <Button size="sm" className="w-full rounded-xl text-xs font-bold bg-success hover:bg-success/90 shadow-lg shadow-success/20" onClick={() => onStatusChange(order.id, "completed")}>
-                Complete Order
+                Mark as Complete
               </Button>
             )}
             {(order.status === "completed" || order.status === "cancelled") && onDelete && (

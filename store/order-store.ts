@@ -2,6 +2,21 @@ import { create } from "zustand";
 import { Order, OrderItem, MenuItem } from "@/types";
 import { api } from "@/lib/api";
 
+const HIDDEN_ORDERS_KEY = 'smartqueue_hidden_orders';
+
+function loadHiddenIds(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(HIDDEN_ORDERS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveHiddenIds(ids: string[]) {
+  if (typeof window === 'undefined') return;
+  try { localStorage.setItem(HIDDEN_ORDERS_KEY, JSON.stringify(ids)); } catch {}
+}
+
 interface OrderState {
   // Customer Cart
   cart: OrderItem[];
@@ -13,6 +28,7 @@ interface OrderState {
 
   // Orders
   orders: Order[];
+  hiddenOrderIds: string[];
   isLoading: boolean;
   fetchOrders: () => Promise<void>;
   placeOrder: (notes?: string) => Promise<Order>;
@@ -23,6 +39,7 @@ interface OrderState {
 export const useOrderStore = create<OrderState>((set, get) => ({
   cart: [],
   cartTotal: 0,
+  hiddenOrderIds: loadHiddenIds(),
   
   addToCart: (item, quantity) => {
     set((state) => {
@@ -92,10 +109,12 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     set({ isLoading: true });
     try {
       const orders = await api.orders.getAll();
-      set({ orders });
+      const hiddenIds = get().hiddenOrderIds;
+      set({
+        orders: orders.filter((o) => !hiddenIds.includes(o.id))
+      });
     } catch (error) {
       console.error("Failed to fetch orders:", error);
-      // Optional: set orders to empty or handle error state
     } finally {
       set({ isLoading: false });
     }
@@ -142,9 +161,14 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     set({ isLoading: true });
     try {
       await api.orders.delete(id);
-      set((state) => ({
-        orders: state.orders.filter((o) => o.id !== id)
-      }));
+      set((state) => {
+        const hiddenIds = [...new Set([...state.hiddenOrderIds, id])];
+        saveHiddenIds(hiddenIds);
+        return {
+          hiddenOrderIds: hiddenIds,
+          orders: state.orders.filter((o) => o.id !== id)
+        };
+      });
     } catch (error) {
       console.error("Failed to delete order history:", error);
       throw error;

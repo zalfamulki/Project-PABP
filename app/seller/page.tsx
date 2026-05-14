@@ -15,25 +15,48 @@ import {
 } from "lucide-react";
 import { useOrderStore } from "@/store/order-store";
 import { useQueueStore } from "@/store/queue-store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function SellerDashboard() {
   const { orders, fetchOrders, updateOrderStatus, deleteOrderHistory } = useOrderStore();
   const { fetchStats } = useQueueStore();
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [completedToday, setCompletedToday] = useState(0);
 
   useEffect(() => {
     fetchOrders();
     fetchStats();
+    fetchRevenue();
   }, [fetchOrders, fetchStats]);
+
+  const fetchRevenue = async () => {
+    try {
+      const data = await api.stats.getDashboard();
+      setTotalRevenue(Number(data.revenueToday || 0));
+    } catch {
+      // Fallback to local calculation
+      const revenue = orders
+        .filter(o => o.status === "completed")
+        .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+      setTotalRevenue(revenue);
+    }
+  };
+
+  useEffect(() => {
+    setCompletedToday(orders.filter(o => o.status === "completed").length);
+    if (totalRevenue === 0 && orders.length > 0) {
+      const revenue = orders
+        .filter(o => o.status === "completed")
+        .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+      if (revenue > 0) setTotalRevenue(revenue);
+    }
+  }, [orders]);
 
   // Derived stats
   const activeOrders = orders.filter(o => o.status === "pending" || o.status === "preparing");
-  const completedToday = orders.filter(o => o.status === "completed").length;
-  const totalRevenue = orders
-    .filter(o => o.status === "completed")
-    .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
   const avgWaitTime = 12; // Mock value
 
   return (

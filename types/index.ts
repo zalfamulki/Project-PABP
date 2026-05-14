@@ -38,6 +38,7 @@ export interface OrderItem {
   quantity: number;
   store_id?: number;
   storeName?: string;
+  isReady?: boolean;
 }
 
 export interface Order {

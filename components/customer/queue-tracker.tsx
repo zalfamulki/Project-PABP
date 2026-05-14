@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Timer, Users, ShoppingBag, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,19 +21,33 @@ const steps = [
 
 export function QueueTracker({ position, totalInQueue, estimatedTime, status }: QueueTrackerProps) {
   const [remainingSeconds, setRemainingSeconds] = useState(estimatedTime * 60);
+  const finishAtRef = useRef(Date.now() + estimatedTime * 60 * 1000);
   const currentStepIndex = steps.findIndex(s => s.id === status);
   const isCompleted = status === "completed";
   const isCancelled = status === "cancelled";
 
+  // Update target finish time whenever estimatedTime changes
   useEffect(() => {
-    if (status === "completed" || status === "cancelled" || remainingSeconds <= 0) return;
+    const now = Date.now();
+    const newFinishAt = now + estimatedTime * 60 * 1000;
+    finishAtRef.current = newFinishAt;
+    setRemainingSeconds(estimatedTime * 60);
+  }, [estimatedTime]);
 
-    const timer = setInterval(() => {
-      setRemainingSeconds(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+  // Countdown based on elapsed time since finishAtRef
+  // Independent of remainingSeconds — never resets due to re-renders
+  useEffect(() => {
+    if (status === "completed" || status === "cancelled") return;
 
+    const tick = () => {
+      const remaining = Math.max(0, Math.round((finishAtRef.current - Date.now()) / 1000));
+      setRemainingSeconds(remaining);
+    };
+
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [status, remainingSeconds]);
+  }, [status, estimatedTime]);
 
   const minutes = Math.floor(remainingSeconds / 60);
   const seconds = remainingSeconds % 60;
