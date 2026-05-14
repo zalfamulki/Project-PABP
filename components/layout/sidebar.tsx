@@ -59,8 +59,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       )}>
         {/* Brand */}
         <div className="flex h-24 items-center px-8 gap-3 border-b border-border/50">
-          <div className="h-11 w-11 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/20 animate-float">
-            <MonitorPlay className="h-6 w-6" />
+          <div className="h-11 w-11 rounded-2xl overflow-hidden flex items-center justify-center shadow-xl animate-float">
+            <img src="/logo.png" alt="SmartQueue Logo" className="h-full w-full object-cover" />
           </div>
           <div className="flex-1">
             <h1 className="text-xl font-black font-heading text-foreground tracking-tight leading-none">

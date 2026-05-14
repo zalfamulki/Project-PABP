@@ -23,8 +23,8 @@ export default function LandingPage() {
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-              <MonitorPlay className="h-6 w-6" />
+            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg">
+              <img src="/logo.png" alt="SmartQueue" className="h-full w-full object-cover" />
             </div>
             <span className="text-2xl font-black font-heading text-foreground tracking-tighter">
               Smart<span className="text-primary">Queue</span>
@@ -96,16 +96,20 @@ export default function LandingPage() {
             transition={{ duration: 1, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative z-10 bg-surface border border-border rounded-[2.5rem] p-4 shadow-2xl overflow-hidden aspect-[4/3] flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
-              <div className="text-center p-12">
-                <div className="h-20 w-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <Smartphone className="h-10 w-10 text-primary" />
-                </div>
-                <h3 className="text-2xl font-bold font-heading text-foreground">Dashboard Interaktif</h3>
-                <p className="text-text-secondary mt-3">Interface siap pakai untuk Penjual dan Pelanggan .</p>
-              </div>
+            <div className="relative z-10 bg-surface border border-border rounded-[2.5rem] p-2 shadow-2xl overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-orange-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <img 
+                src="/dashboard-preview.png" 
+                alt="SmartQueue Dashboard Preview" 
+                className="w-full h-auto rounded-[2rem] transition-transform duration-700 group-hover:scale-105"
+              />
+              
+      
             </div>
+            
+            {/* Decorative elements behind the image */}
+            <div className="absolute -top-10 -right-10 h-64 w-64 bg-primary/10 blur-[100px] rounded-full animate-pulse" />
+            <div className="absolute -bottom-10 -left-10 h-64 w-64 bg-orange-400/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
           </motion.div>
         </div>
       </section>
@@ -120,28 +124,69 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Zap, title: "Tanpa Lag", desc: "sinkronisasi pesanan real-time di semua perangkat secara instan." },
-              { icon: Clock, title: "Estimasi Cerdas", desc: "kalkulasi waktu tunggu otomatis berdasarkan kepadatan antrian." },
-              { icon: Store, title: "Multi-Store", desc: "kelola berbagai cabang dari satu dashboard terpadu." }
+              { 
+                icon: Zap, 
+                title: "Tanpa Lag", 
+                desc: "Sinkronisasi pesanan real-time di semua perangkat secara instan tanpa jeda.",
+                color: "from-blue-500/20 to-cyan-500/20",
+                iconColor: "text-blue-500",
+                glow: "bg-blue-500/10"
+              },
+              { 
+                icon: Clock, 
+                title: "Estimasi Cerdas", 
+                desc: "Kalkulasi waktu tunggu otomatis berdasarkan kepadatan antrian yang akurat.",
+                color: "from-orange-500/20 to-yellow-500/20",
+                iconColor: "text-orange-500",
+                glow: "bg-orange-500/10"
+              },
+              { 
+                icon: Store, 
+                title: "Multi-Store", 
+                desc: "Kelola berbagai cabang dari satu dashboard terpadu dengan kontrol penuh.",
+                color: "from-purple-500/20 to-pink-500/20",
+                iconColor: "text-purple-500",
+                glow: "bg-purple-500/10"
+              }
             ].map((feature, i) => (
-              <div key={i} className="p-10 bg-surface rounded-[2rem] border border-border hover:border-primary/50 transition-all hover:shadow-xl group">
-                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform">
-                  <feature.icon className="h-7 w-7" />
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="relative p-10 bg-surface rounded-[2.5rem] border border-border hover:border-primary/50 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] group overflow-hidden"
+              >
+                {/* Background Decoration */}
+                <div className={`absolute -right-10 -bottom-10 h-32 w-32 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 ${feature.glow}`} />
+                
+                <div className={`h-20 w-20 rounded-3xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-8 relative group-hover:rotate-6 transition-transform duration-500`}>
+                  <div className={`absolute inset-0 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${feature.glow}`} />
+                  <feature.icon className={`h-10 w-10 relative z-10 ${feature.iconColor}`} />
                 </div>
-                <h3 className="text-2xl font-bold font-heading text-foreground mb-4">{feature.title}</h3>
-                <p className="text-text-secondary leading-relaxed">{feature.desc}</p>
-              </div>
+                
+                <h3 className="text-2xl font-bold font-heading text-foreground mb-4 relative z-10">
+                  {feature.title}
+                </h3>
+                <p className="text-text-secondary leading-relaxed relative z-10">
+                  {feature.desc}
+                </p>
+                
+                {/* Bottom Highlight */}
+                <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-700 bg-gradient-to-r ${feature.color.replace('/20', '')}`} />
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 border-t border-border">
+      <footer className="py-10 border-t border-border">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white">
-              <MonitorPlay className="h-5 w-5" />
+            <div className="h-8 w-8 rounded-lg overflow-hidden flex items-center justify-center">
+              <img src="/logo.png" alt="SmartQueue" className="h-full w-full object-cover" />
             </div>
             <span className="text-xl font-black font-heading text-foreground">
               Smart<span className="text-primary">Queue</span>
